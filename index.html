@@ -35,31 +35,25 @@
 <body>
   <h1>CVtoSite → Reactive Resume Converter</h1>
 
-  <!-- Go to Reactive Resume Button -->
   <a href="https://rxresu.me/auth/login" target="_blank" style="display:inline-block; margin: 1rem 0; padding: 0.75rem 1.5rem; background-color: #0ea5e9; color: white; font-weight: bold; text-decoration: none; border-radius: 0.5rem;">
     → Go to Reactive Resume
   </a>
 
-  <!-- Show Instructions Button -->
   <button id="showInstructionsBtn" style="margin-left: 1rem; padding: 0.5rem 1rem; background-color: #2563eb; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">
     📘 Show Instructions
   </button>
 
-  <!-- Drop Zone -->
   <div class="drop-zone" id="drop-zone">
     <p><strong>Drop your CVtoSite JSON file here</strong> or click to upload</p>
     <input type="file" id="fileInput" style="display: none" accept="application/json" />
   </div>
 
-  <!-- Output -->
   <div class="output" id="output" style="display: none">
     <p>✅ File converted! <a id="downloadLink" href="#" download="rxresume-converted.json">Download JSON</a></p>
   </div>
 
-  <!-- Error -->
   <div class="error" id="error" style="display: none"></div>
 
-  <!-- Instructions Modal -->
   <div id="instructionsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;">
     <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative;">
       <h2>📋 How to Use This Tool</h2>
@@ -76,7 +70,6 @@
     </div>
   </div>
 
-  <!-- Main Script -->
   <script>
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('fileInput');
@@ -132,7 +125,6 @@
         email: contact.email || '',
         phone: contact.phone || '',
         headline: profile.headline || '',
-        summary: profile.bio || '',
         location: contact.location || '',
         url: { label: '', href: '' },
         customFields: [],
@@ -145,16 +137,22 @@
         }
       };
 
-      const experience = (profile.experience || []).map(job => ({
-        id: cuid2(),
-        visible: true,
-        company: job.company || '',
-        position: job.title || '',
-        location: '',
-        date: job.period || '',
-        summary: `<p>${(job.details || []).join('<br>')}</p>`,
-        url: { label: '', href: '' }
-      }));
+      const experience = (profile.experience || []).map(job => {
+        const details = job.details || [];
+        const summary = details.length > 0
+          ? `<ul>${details.map(d => `<li><p>${d}</p></li>`).join('')}</ul>`
+          : '';
+        return {
+          id: cuid2(),
+          visible: true,
+          company: job.company || '',
+          position: job.title || '',
+          location: '',
+          date: job.period || '',
+          summary,
+          url: { label: '', href: '' }
+        };
+      });
 
       const education = (profile.education || []).map(edu => ({
         id: cuid2(),
@@ -164,7 +162,7 @@
         area: '',
         score: '',
         date: edu.year || '',
-        summary: '',
+        summary: edu.description ? `<p>${edu.description}</p>` : '',
         url: { label: '', href: '' }
       }));
 
@@ -216,12 +214,10 @@
       };
     }
 
-    // Modal functionality
     const modal = document.getElementById('instructionsModal');
     const showBtn = document.getElementById('showInstructionsBtn');
     const closeBtn = document.getElementById('closeModalBtn');
 
-    // Show on page load once
     window.addEventListener('load', () => {
       if (!sessionStorage.getItem('modalShown')) {
         modal.style.display = 'flex';
