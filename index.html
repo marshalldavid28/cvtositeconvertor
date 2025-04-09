@@ -34,18 +34,49 @@
 </head>
 <body>
   <h1>CVtoSite → Reactive Resume Converter</h1>
+
+  <!-- Go to Reactive Resume Button -->
   <a href="https://rxresu.me/auth/login" target="_blank" style="display:inline-block; margin: 1rem 0; padding: 0.75rem 1.5rem; background-color: #0ea5e9; color: white; font-weight: bold; text-decoration: none; border-radius: 0.5rem;">
-  → Go to Reactive Resume
-  </a>  
+    → Go to Reactive Resume
+  </a>
+
+  <!-- Show Instructions Button -->
+  <button id="showInstructionsBtn" style="margin-left: 1rem; padding: 0.5rem 1rem; background-color: #2563eb; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">
+    📘 Show Instructions
+  </button>
+
+  <!-- Drop Zone -->
   <div class="drop-zone" id="drop-zone">
     <p><strong>Drop your CVtoSite JSON file here</strong> or click to upload</p>
     <input type="file" id="fileInput" style="display: none" accept="application/json" />
   </div>
+
+  <!-- Output -->
   <div class="output" id="output" style="display: none">
     <p>✅ File converted! <a id="downloadLink" href="#" download="rxresume-converted.json">Download JSON</a></p>
   </div>
+
+  <!-- Error -->
   <div class="error" id="error" style="display: none"></div>
 
+  <!-- Instructions Modal -->
+  <div id="instructionsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative;">
+      <h2>📋 How to Use This Tool</h2>
+      <ol style="margin-top: 1rem; padding-left: 1.2rem;">
+        <li>Upload the JSON file you just downloaded from <strong>CVtoSite</strong></li>
+        <li>Download the converted JSON file that is generated here for you</li>
+        <li>Click on <strong>Go to Reactive Resume</strong></li>
+        <li>Sign up on Reactive Resume for free</li>
+        <li>Click on "Import an existing resume" and choose "Reactive Resume (json)"</li>
+        <li>Upload the file you just downloaded from the converter and hit <strong>Validate</strong></li>
+        <li>Import and you are ready to edit your new CV!</li>
+      </ol>
+      <button id="closeModalBtn" style="margin-top: 1rem; background-color: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer;">Close</button>
+    </div>
+  </div>
+
+  <!-- Main Script -->
   <script>
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('fileInput');
@@ -184,6 +215,33 @@
         }
       };
     }
+
+    // Modal functionality
+    const modal = document.getElementById('instructionsModal');
+    const showBtn = document.getElementById('showInstructionsBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+
+    // Show on page load once
+    window.addEventListener('load', () => {
+      if (!sessionStorage.getItem('modalShown')) {
+        modal.style.display = 'flex';
+        sessionStorage.setItem('modalShown', 'true');
+      }
+    });
+
+    showBtn.addEventListener('click', () => {
+      modal.style.display = 'flex';
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        modal.style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
